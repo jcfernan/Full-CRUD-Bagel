@@ -1,16 +1,27 @@
 console.log( "Hi there")
 
-fetch('http://bagel-api-fis.herokuapp.com/bagels')
-    .then(response => response.json())
-    .then(result => handleBagels(result))
+var myHeaders = new Headers();
+myHeaders.append("x-ebirdapitoken", "cn9j4ts7dra2");
 
-function handleBagels (bagels) {
-    return bagels.forEach(bagel => renderBagel(bagel.type, bagel.id))
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+  redirect: 'follow'
+};
+
+fetch("https://api.ebird.org/v2/data/obs/geo/recent?lat=39.7002&lng=-104.9640", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .then(result => handleBirds(result))
+  .catch(error => console.log('error', error));
+
+function handleBirds (birds) {
+    return birds.forEach(bird => renderBird(comName, howMany))
 }
 
 const bagelsList = document.getElementById('bagel-ul')
 
-function renderBagel (bagel, id) {
+function renderBird (bagel, id) {
     const li = document.createElement('li')
     li.innerText = bagel
     li.id = id
@@ -29,7 +40,7 @@ function createDeleteButton(li) {
 }
 
 function bagelDelete(event, id){
-    fetch (`http://bagel-api-fis.herokuapp.com/bagels/${id}`,
+    fetch (`http://bagel-api-fis.herokuapp.com/birds/${id}`,
     {
         method: 'DELETE'
     })
@@ -56,7 +67,7 @@ function bagelUpdate(event){
 function handleUpdateForm(event){
     event.preventDefault()
     const updatedBagel = event.target.children[0].value
-    renderBagel(updatedBagel)
+    renderBird(updatedBagel)
     persistBagelUpdate(event.target.parentNode.id, updatedBagel)
     event.target.parentNode.remove()
 }
@@ -79,7 +90,7 @@ function captureFormInput(event) {
     event.preventDefault()
     const formData = new FormData(bagelForm)
     const newBagel = formData.get('bagel')
-    renderBagel(newBagel)
+    renderBird(newBagel)
     persistBagel(newBagel)
 }
 
